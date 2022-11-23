@@ -19,7 +19,7 @@ pub fn build(b: *std.build.Builder) !void {
 
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
-    const exe = b.addExecutable("hello", source);
+    const exe = b.addExecutable(source[2..source.len - 4], source);
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
