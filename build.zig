@@ -11,15 +11,15 @@ pub fn build(b: *std.build.Builder) !void {
     const args = try process.argsAlloc(allocator);
     defer process.argsFree(allocator, args);
 
-    for (args) |a| {
-        print("\n{s}", .{a});
-    }
+    // for (args) |a| {
+    //     print("\n{s}", .{a});
+    // }
     const source = if (args.len > 2) args[args.len - 1] else "./hello.zig";
     print("Building {s}", .{source});
 
     const target = b.standardTargetOptions(.{});
     const mode = b.standardReleaseOptions();
-    const exe = b.addExecutable("hello", "./hello.zig");
+    const exe = b.addExecutable("hello", source);
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
