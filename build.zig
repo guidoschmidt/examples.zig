@@ -18,12 +18,11 @@ pub fn build(b: *std.build.Builder) !void {
     print("Building {s}", .{source});
 
     const target = b.standardTargetOptions(.{});
-    const mode = b.standardReleaseOptions();
-
-
-    const exe = b.addExecutable(source[4..source.len - 4], source);
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
+    const exe = b.addExecutable(.{
+        .root_source_file = .{ .path = source },
+        .name = source[4..source.len - 4],
+        .target = target
+    });
     exe.install();
 
     const run_cmd = exe.run();
