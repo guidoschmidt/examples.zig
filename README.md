@@ -6,7 +6,22 @@ Make sure to use [zig 0.11.0](https://ziglang.org/download/).
 
 ### Bulid and run the examples
 
-To run an example use `zig build` and pass the name of the example source like this:
-```zig build run -- src/filename.zig```
+To run an example use `zig build run` and type in one of the listed example source like this:
+```
+zig build run
 
-e.g. `zig build run -- src/files.zig`
+>>> Found the following example sourc files:
+× greet.zig
+× arrays.zig
+× files.zig
+× http-client.zig
+× buffers.zig
+× json.zig
+× bits.zig
+× input.zig
+× cpp
+× hello.zig
+
+→ Which example should be built?
+files.zig
+```
