@@ -1,12 +1,11 @@
 const std = @import("std");
 const io = std.io;
 const fs = std.fs;
-const cwd = fs.cwd();
 const print = std.debug.print;
 const heap = std.heap;
 const process = std.process;
 
-pub fn build(b: *std.build.Builder) !void {
+pub fn build(b: *std.Build) !void {
     var gpa = heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -14,43 +13,56 @@ pub fn build(b: *std.build.Builder) !void {
     const args = try process.argsAlloc(allocator);
     defer process.argsFree(allocator, args);
 
-    for (args) |a| {
-        print("\n{s}", .{a});
-    }
-
-    var input_buffer: []u8 = try allocator.alloc(u8, 10);
-    defer allocator.free(input_buffer);
 
     print("\n\n>>> Found the following example sourc files:\n", .{});
-    const src_dir = try cwd.openIterableDir("./src", .{});
+    const src_dir = try fs.cwd().openIterableDir("./src", .{});
     var it = src_dir.iterate();
-    while (try it.next()) |path| {
-        print("× {s}\n", .{ path.name });
+    var i: u32 = 0;
+    while (try it.next()) |path| : (i += 1) {
+        if (!std.mem.containsAtLeast(u8, path.name, 1, ".zig")) continue;
+        print("- {d} {s}\n", .{ i, path.name });
     }
 
-    print("\n→ Which example should be built?\n", .{});
-    if (try std.io.getStdIn()
-            .reader()
-            .readUntilDelimiterOrEof(input_buffer[0..], '\n')) |user_input| {
-        const source = try std.fmt.allocPrint(allocator, "./src/{s}", .{ user_input });
-        defer allocator.free(source);
-        print("→ Building {s}\n\n", .{ source });
+    const in = std.io.getStdIn();
+    var buf = std.io.bufferedReader(in.reader());
 
-        const target = b.standardTargetOptions(.{});
-        const exe = b.addExecutable(.{
-            .root_source_file = .{ .path = source },
-            .name = source[6..source.len - 4],
-            .target = target
-        });
-        exe.install();
+    // Get the Reader interface from BufferedReader
+    var r = buf.reader();
 
-        const run_cmd = exe.run();
-        run_cmd.step.dependOn(b.getInstallStep());
-        if (b.args) |buildArgs| {
-            run_cmd.addArgs(buildArgs);
+    std.debug.print("Write something: ", .{});
+    // Ideally we would want to issue more than one read
+    // otherwise there is no point in buffering.
+    var msg_buf: [4096]u8 = undefined;
+    var input = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
+
+    if (input) | input_txt | {
+        const selection_idx = std.fmt.parseInt(usize, input_txt[0..input_txt.len - 1], 10) catch 0;
+        it.reset();
+        var j: u32 = 0;
+        while (j < selection_idx) : (j += 1) {
+            _ = try it.next();
         }
+        if (try it.next()) |entry| {
+            const source = try std.fmt.allocPrint(allocator, "src/{s}", .{ entry.name });
+            defer allocator.free(source);
+            print("\n...Building {s}", .{ source });
 
-        const run_step = b.step("run", "Run the program");
-        run_step.dependOn(&run_cmd.step);
+            const target = b.standardTargetOptions(.{});
+            const exe_name = fs.path.basename(source);
+            const exe = b.addExecutable(.{
+                .root_source_file = .{ .path = source },
+                .name = exe_name,
+                .target = target
+            });
+            b.installArtifact(exe);
+
+            const run_cmd = b.addRunArtifact(exe);
+            run_cmd.step.dependOn(b.getInstallStep());
+            if (b.args) |buildArgs| {
+                run_cmd.addArgs(buildArgs);
+            }
+            const run_step = b.step("run", "Run the program");
+            run_step.dependOn(&run_cmd.step);
+        }
     }
 }
