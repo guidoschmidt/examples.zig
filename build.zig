@@ -1,9 +1,16 @@
 const std = @import("std");
 const io = std.io;
+const log = std.log;
 const fs = std.fs;
 const print = std.debug.print;
 const heap = std.heap;
 const process = std.process;
+
+fn createExecutable(b: *std.Build, source: []u8) !void {
+    _ = source;
+    _ = b;
+    
+}
 
 pub fn build(b: *std.Build) !void {
     var gpa = heap.GeneralPurposeAllocator(.{}){};
@@ -29,23 +36,25 @@ pub fn build(b: *std.Build) !void {
     // Get the Reader interface from BufferedReader
     var r = buf.reader();
 
-    std.debug.print("Write something: ", .{});
+    print("\nSelect: ", .{});
     // Ideally we would want to issue more than one read
     // otherwise there is no point in buffering.
     var msg_buf: [4096]u8 = undefined;
     var input = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
 
     if (input) | input_txt | {
-        const selection_idx = std.fmt.parseInt(usize, input_txt[0..input_txt.len - 1], 10) catch 0;
+        const selection_idx = try std.fmt.parseInt(usize, input_txt, 10);
+        print("\nSelected {d}", .{ selection_idx });
+        
         it.reset();
         var j: u32 = 0;
         while (j < selection_idx) : (j += 1) {
             _ = try it.next();
         }
         if (try it.next()) |entry| {
-            const source = try std.fmt.allocPrint(allocator, "src/{s}", .{ entry.name });
+            const source = try std.fmt.allocPrint(allocator, "./src/{s}", .{ entry.name });
             defer allocator.free(source);
-            print("\n...Building {s}", .{ source });
+            print("\n...Building {s} {s}", .{ entry.name, source });
 
             const target = b.standardTargetOptions(.{});
             const exe_name = fs.path.basename(source);
