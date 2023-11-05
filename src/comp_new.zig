@@ -1,25 +1,24 @@
 const std = @import("std");
 
-fn comp(comptime T: type, comptime fns: anytype) *const fn(args: T) T {
+fn comp(comptime T: type, comptime fns: anytype) *const fn (args: T) T {
     return struct {
         pub fn f(args: T) T {
             var tmp: T = args;
-            inline for(fns) |func| {
-                tmp = @call(.auto, func, .{T, tmp});
+            inline for (fns) |func| {
+                tmp = @call(.auto, func, .{ T, tmp });
             }
             return tmp;
         }
     }.f;
 }
 
-fn partial(comptime T: type, comptime fun: anytype, comptime arg0: T) *const fn(t: @TypeOf(T), args: T) T {
+fn partial(comptime T: type, comptime fun: anytype, comptime arg0: T) *const fn (t: @TypeOf(T), args: T) T {
     return struct {
         pub fn f(comptime t: @TypeOf(T), arg: T) T {
             return fun(t, arg0, arg);
         }
     }.f;
 }
-
 
 fn add2(comptime T: type, v: T) T {
     return v + 2;
@@ -51,8 +50,8 @@ pub fn main() !void {
         partial(f32, addX, 10),
     });
     std.debug.print("\n\n(x * 5) + 10", .{});
-    for(1..10) |x| {
-        const result =  c_f32(@floatCast(@as(f32, @floatFromInt(x)))) ;
+    for (1..10) |x| {
+        const result = c_f32(@floatCast(@as(f32, @floatFromInt(x))));
         std.debug.print("\n{x:.2}  →  {d:>5.2}, {any}", .{ x, result, @TypeOf(result) });
     }
 
@@ -61,8 +60,8 @@ pub fn main() !void {
         partial(i32, divX, 2),
     });
     std.debug.print("\n\n(x * 10) / 2", .{});
-    for(1..10) |x| {
-        const result =  c_i32(@intCast(x)) ;
+    for (1..10) |x| {
+        const result = c_i32(@intCast(x));
         std.debug.print("\n{d}  →  {d}, {any}", .{ x, result, @TypeOf(result) });
     }
 }
