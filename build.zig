@@ -22,7 +22,7 @@ pub fn build(b: *std.Build) !void {
 
 
     print("\n\n>>> Found the following example sourc files:\n", .{});
-    const src_dir = try fs.cwd().openIterableDir("./src", .{});
+    const src_dir = try fs.cwd().openDir("./src", .{});
     var it = src_dir.iterate();
     var i: u32 = 0;
     while (try it.next()) |path| : (i += 1) {
@@ -40,7 +40,7 @@ pub fn build(b: *std.Build) !void {
     // Ideally we would want to issue more than one read
     // otherwise there is no point in buffering.
     var msg_buf: [4096]u8 = undefined;
-    var input = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
+    const input = try r.readUntilDelimiterOrEof(&msg_buf, '\n');
 
     if (input) | input_txt | {
         const selection_idx = try std.fmt.parseInt(usize, input_txt, 10);
