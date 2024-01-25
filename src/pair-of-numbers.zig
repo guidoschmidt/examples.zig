@@ -1,3 +1,5 @@
+//! Source: https://stackoverflow.blog/2022/01/31/the-complete-beginners-guide-to-dynamic-programming
+//!
 //! In a technical interview, you've been given an array of numbers and you need to
 //! find a pair of numbers that are equal to the given target value. Numbers can be
 //! either positive, negative, or both. Can you design an algorithm that works in
