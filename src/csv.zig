@@ -14,7 +14,6 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     std.log.info("\nReading {s}\nCSV file size: {d}", .{ file_path, stats.size });
     const reader = file.reader();
 
-
     var column_labels = std.ArrayList(u8).init(allocator);
     defer column_labels.deinit();
     try reader.streamUntilDelimiter(column_labels.writer(), '\n', null);

@@ -1,24 +1,5 @@
 const std = @import("std");
-
-fn comp(comptime T: type, comptime fns: anytype) *const fn (args: T) T {
-    return struct {
-        pub fn f(args: T) T {
-            var tmp: T = args;
-            inline for (fns) |func| {
-                tmp = @call(.auto, func, .{ T, tmp });
-            }
-            return tmp;
-        }
-    }.f;
-}
-
-fn partial(comptime T: type, comptime fun: anytype, comptime arg0: T) *const fn (t: @TypeOf(T), args: T) T {
-    return struct {
-        pub fn f(comptime t: @TypeOf(T), arg: T) T {
-            return fun(t, arg0, arg);
-        }
-    }.f;
-}
+const f = @import("lib/functional.zig");
 
 fn add2(comptime T: type, v: T) T {
     return v + 2;
@@ -45,9 +26,9 @@ fn multX(comptime T: type, v: T, m: T) T {
 }
 
 pub fn main() !void {
-    const c_f32 = comp(f32, &.{
-        partial(f32, multX, 5),
-        partial(f32, addX, 10),
+    const c_f32 = f.comp(f32, &.{
+        f.partial(f32, multX, 5),
+        f.partial(f32, addX, 10),
     });
     std.debug.print("\n\n(x * 5) + 10", .{});
     for (1..10) |x| {
@@ -55,9 +36,9 @@ pub fn main() !void {
         std.debug.print("\n{x:.2}  →  {d:>5.2}, {any}", .{ x, result, @TypeOf(result) });
     }
 
-    const c_i32 = comp(i32, &.{
-        partial(i32, multX, 10),
-        partial(i32, divX, 2),
+    const c_i32 = f.comp(i32, &.{
+        f.partial(i32, multX, 10),
+        f.partial(i32, divX, 2),
     });
     std.debug.print("\n\n(x * 10) / 2", .{});
     for (1..10) |x| {
