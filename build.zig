@@ -59,7 +59,7 @@ pub fn build(b: *std.Build) !void {
             const target = b.standardTargetOptions(.{});
             const exe_name = fs.path.basename(source);
             const exe = b.addExecutable(.{
-                .root_source_file = .{ .path = source },
+                .root_source_file = b.path(source),
                 .name = exe_name,
                 .target = target
             });
