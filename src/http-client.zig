@@ -1,19 +1,26 @@
 const std = @import("std");
     
-const uri = std.Uri.parse("https://ziglang.org") catch unreachable;
-
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
 
-    var c: std.http.Client = .{ .allocator = allocator };
-    defer c.deinit();
+    var client: std.http.Client = .{ .allocator = allocator };
+    defer client.deinit();
 
-    var req = try c.request(uri, .{}, .{});
-    var buffer: []u8 = allocator.alloc(u8, 1024) catch unreachable;
-    _ = req.readAll(buffer) catch unreachable;
-    defer req.deinit();
+    var body = std.ArrayList(u8).init(allocator);
+    defer body.deinit();
 
-    std.debug.print("\n→ {?}", .{ req.response.state });
-    std.debug.print("\n  {s}", .{ buffer });
+    const req = try client.fetch(.{
+        .location = .{ .url = "https://ziglang.org" },
+        .extra_headers = &.{},
+        .response_storage = .{
+            .dynamic = &body,
+        }
+    });
+
+    if (req.status == .ok) {
+        std.debug.print("\n200 -- Response {s}", .{ body.items });
+    } else {
+        std.debug.print("\nSTATUS {d}", .{ req.status });
+    }
 }
