@@ -1,6 +1,7 @@
 /// Sources:
-// https://zig.news/kristoff/easy-interfaces-with-zig-0100-2hc5
-// https://www.youtube.com/watch?v=AHc4x1uXBQE
+/// https://zig.news/kristoff/easy-interfaces-with-zig-0100-2hc5
+/// https://www.youtube.com/watch?v=AHc4x1uXBQE
+/// https://ziggit.dev/t/polymorphism-with-zig-0-10-0/463/10
 
 const std = @import("std");
 
