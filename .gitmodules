@@ -1,3 +1,0 @@
-[submodule "http-requests/libs/zelda"]
-	path = http-requests/libs/zelda
-	url = git@github.com:haze/zelda.git
