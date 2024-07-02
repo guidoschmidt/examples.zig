@@ -7,9 +7,18 @@ pub fn main() !void {
     var ring_buffer = try std.RingBuffer.init(allocator, 10);
 
     var i: u32 = 0;
+
+    var prng = std.rand.DefaultPrng.init(blk: {
+        var seed: u64 = undefined;
+        try std.posix.getrandom(std.mem.asBytes(&seed));
+        break :blk seed;
+    });
+    var rng = prng.random();
+
     while(i < 300) : (i += 1) {
-        var r = std.rand.Random.int(u32);
+        const r = rng.int(u8);
         ring_buffer.writeAssumeCapacity(r);
+        std.debug.print("\n{any}", .{ ring_buffer });
     }
     var mean: u32 = 0;
     std.debug.print("\n", .{});
