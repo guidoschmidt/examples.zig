@@ -2,9 +2,9 @@ const std = @import("std");
 
 const Subscriber = struct {
     id: []const u8,
-    onNextFn: ?*const fn(*const *Subscriber, i32) void = undefined,
+    onNextFn: ?*const fn(*Subscriber, i32) void = undefined,
 
-    pub fn onNext(self: *const *Subscriber, value: i32) void {
+    pub fn onNext(self: *Subscriber, value: i32) void {
         self.onNextFn.?(self, value);
     }
 };
@@ -27,9 +27,36 @@ const Subscription = struct {
 
     pub fn next(self: *Subscription, value: i32) void {
         var val_it = self.subscribers.valueIterator();
-        while(val_it.next()) |*sub| {
-            sub.*.onNextFn.?(sub, value);
+        while(val_it.next()) |sub| {
+            if (sub.*.onNextFn) |onNextFn| onNextFn(sub, value);
         }
+    }
+};
+
+const ReactiveRenderer = struct {
+    sub: Subscriber = undefined,
+
+    pub fn init() ReactiveRenderer {
+        const impl = struct {
+            pub fn onNext(ptr: *Subscriber, _: i32) void {
+                const self: *ReactiveRenderer = @fieldParentPtr("sub", ptr);
+                return self.render();
+            }
+        };
+        return ReactiveRenderer {
+            .sub = Subscriber {
+                .id = "renderer",
+                .onNextFn = impl.onNext,
+            }
+        };
+    }
+
+    pub fn subscribe(self: *ReactiveRenderer, publisher: *Subscription) !void {
+        try publisher.subscribe(self.sub);
+    }
+
+    pub fn render(self: *ReactiveRenderer) void {
+        std.debug.print("\nRENDER / next frame: {s}", .{ self.sub.id });
     }
 };
 
@@ -43,7 +70,7 @@ pub fn main() !void {
     try publisher.subscribe(.{
         .id = "echo",
         .onNextFn = struct{
-                pub fn onNext(self: *const *Subscriber, v: i32) void {
+                pub fn onNext(self: *Subscriber, v: i32) void {
                     std.debug.print("\n{s} ---> {d}", .{ self.*.id, v });
                 }
             }.onNext
@@ -52,7 +79,7 @@ pub fn main() !void {
     try publisher.subscribe(.{
         .id = "multiply",
         .onNextFn = struct{
-            pub fn onNext(self: *const *Subscriber, v: i32) void {
+            pub fn onNext(self: *Subscriber, v: i32) void {
                 std.debug.print("\n{s} ---> {d}", .{ self.*.id, v * 10 });
             }
         }.onNext
@@ -66,10 +93,27 @@ pub fn main() !void {
         break: stream;
     }
 
+    // Reactive renderer
+    var renderer = ReactiveRenderer.init();
+    try renderer.subscribe(&publisher);
+
     // Input loop
     const in = std.io.getStdIn();
     var buf = std.io.bufferedReader(in.reader());
     var r = buf.reader();
+
+    // const fps = 10;
+    // const ms_per_frame = @divTrunc(1, fps) * 1000;
+    // std.debug.print("\nms / frame {d}", .{ ms_per_frame });
+    // var now = @divTrunc(std.time.nanoTimestamp(), std.time.ns_per_ms);
+    // while (true) {
+    //     const then = @divTrunc(std.time.nanoTimestamp(), std.time.ns_per_ms);
+    //     const elapsed = then - now;
+    //     if (elapsed >= ms_per_frame) {
+    //         publisher.next(0);
+    //         now = then; 
+    //     }
+    // }
 
     input_loop: while (true) {
         var msg_buf: [4096]u8 = undefined;
