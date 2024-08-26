@@ -13,12 +13,8 @@ fn createExecutable(b: *std.Build, source: []u8) !void {
 }
 
 pub fn build(b: *std.Build) !void {
-    var gpa = heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
-    const args = try process.argsAlloc(allocator);
-    defer process.argsFree(allocator, args);
+    const args = try process.argsAlloc(b.allocator);
+    defer process.argsFree(b.allocator, args);
 
     print("\n\n>>> Found the following example sourc files:\n", .{});
     const src_dir = try fs.cwd().openDir("./src", .{ .iterate = true });
@@ -30,8 +26,8 @@ pub fn build(b: *std.Build) !void {
     }
 
     const example_name = args[args.len - 1];
-    const source = try std.fmt.allocPrint(allocator, "./src/{s}.zig", .{ example_name });
-    defer allocator.free(source);
+    const source = try std.fmt.allocPrint(b.allocator, "./src/{s}.zig", .{ example_name });
+    defer b.allocator.free(source);
     print("\n...Building {s} {s}\n\n", .{ example_name, source });
 
     const target = b.standardTargetOptions(.{});
