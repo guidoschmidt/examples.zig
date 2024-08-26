@@ -12,6 +12,7 @@ const Shape = struct {
 
 const Circle = struct {
     shape: Shape,
+    points: std.ArrayList(i64) = undefined,
 
     radius: f32 = 1,
 
@@ -22,7 +23,11 @@ const Circle = struct {
                 return self.calcArea();
             }
         };
+        var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+        const allocator = gpa.allocator();
+
         return Circle {
+            .points = std.ArrayList(i64).init(allocator),
             .radius = radius,
             .shape = Shape {
                 .calcAreaFn = impl.calcArea,
@@ -31,6 +36,7 @@ const Circle = struct {
     }
 
     pub fn calcArea(self: *Circle) f32 {
+        std.debug.print("\n{any}", .{ self });
         return self.radius * std.math.pi * 2.0;
     }
 
