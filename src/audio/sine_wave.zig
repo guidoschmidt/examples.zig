@@ -4,13 +4,15 @@
 const std = @import("std");
 
 const SAMPLE_RATE = 44100;
-const CHANNELS = 2;
+const CHANNELS = 1;
 const HEADER_SIZE = 36;
 const SUBCHUNK1_SIZE = 16;
 const AUDIO_FORMAT = 1;
 const BIT_DEPTH = 8;
 const BYTE_SIZE = 8;
 const PI = std.math.pi;
+
+
 
 fn write_header(seconds: u32, file: std.fs.File.Writer) !void {
     const num_samples: u32 = SAMPLE_RATE * seconds;
