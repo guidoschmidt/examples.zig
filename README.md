@@ -5,13 +5,12 @@
 
 ### Bulid and run the examples
 
-To run an example use `zig build example_name`:
+Build all examples:
 ```
-zig build greet
+zig build
 ```
 
-
-To run an example use `zig build example_name`:
+Build and run a single example with `zig build example_name`, e.g.
 ```
 zig build greet
 ```
