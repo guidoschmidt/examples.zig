@@ -52,9 +52,9 @@ pub fn main() !void {
     const inner = "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />";
     _ = inner;
 
-    const svg = f.partial2([]const u8, wrap, "svg", "viewBox=\"0 0 300 100\" xmlns=\"http://www.w3.org/2000/svg\"");
-    const g = f.partial([]const u8, wrapNoOpts, "g");
-    const t = f.partial2([]const u8, wrap, "text", "fill=\"black\" x=\"0\" y=\"0\"");
+    const svg = f.partial2Typed([]const u8, wrap, "svg", "viewBox=\"0 0 300 100\" xmlns=\"http://www.w3.org/2000/svg\"");
+    const g = f.partialTyped([]const u8, wrapNoOpts, "g");
+    const t = f.partial2Typed([]const u8, wrap, "text", "fill=\"black\" x=\"0\" y=\"0\"");
     
     const output = svg(g(t("Test")));
     std.debug.print("\n{s}", .{ output });

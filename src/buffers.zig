@@ -11,7 +11,7 @@ pub fn main() !void {
     // Create a fixed size array with 10 elements
     var fixed_array = [_]u8{ 0 } ** 10;
     std.debug.print("{}", .{ @TypeOf(fixed_array) });
-    for (fixed_array[5..10]) |_, i| {
+    for (fixed_array[5..10]) |i| {
         fixed_array[i] = 10;
     }
     for (fixed_array) |e| {
@@ -25,8 +25,8 @@ pub fn main() !void {
     std.debug.print("dynamic array type {}\n", .{ @TypeOf(dynamic_array) });
     std.debug.print("dynamic array length {}\n", .{ dynamic_array.len });
     dynamic_array[0] = 99;
-    for (dynamic_array) |_, i| {
+    for (0..dynamic_array.len) |i| {
         dynamic_array[i] = 5;
-        std.debug.print("-> {}\n", .{ dynamic_array[i] });
+        std.debug.print("→ {d}: {}\n", .{ i, dynamic_array[i] });
     }
 }

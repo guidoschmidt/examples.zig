@@ -1,6 +1,6 @@
 const std = @import("std");
 
-fn closure(comptime func: anytype) *anyopaque {
+fn closure(comptime func: anytype) *const @TypeOf(func) {
     const internal_struct = struct {
         pub fn call(params: i32, b: f32) void {
             std.debug.print("\nParams {any}", .{ params });
@@ -18,15 +18,4 @@ pub fn internal_fn(a: i32, b: f32) void {
 pub fn main() !void {
     const c = closure(internal_fn);
     c(2, 3.1415);
-
-    // const std_in = std.io.getStdIn();
-    // var in_buffer = std.io.bufferedReader(std_in.reader());
-    // var reader = in_buffer.reader();
-
-    // var msg_buf: [512]u8 = undefined;
-    // std.debug.print("\n", .{});
-    // while(true) {
-    //     var input = try reader.readUntilDelimiter(&msg_buf, '\n');
-    //     std.debug.print("\n{s}", .{ input });
-    // }
 }

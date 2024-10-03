@@ -1,26 +1,61 @@
 const std = @import("std");
 
 const GameActor = struct {
-    pub fn jump() void {}
+    x: i8,
+    y: i8,
 
-    pub fn fire() void {}
+    pub fn jump(self: *GameActor, dir: i8) void {
+        self.y = self.y -| dir;
+    }
+
+    pub fn move(self: *GameActor, dir: i8) void {
+        self.x += dir;
+    }
+
+    pub fn update(self: *GameActor, ground: i8) void {
+        self.y = @min(ground, self.y + 1);
+        self.x = @mod(self.x, 99);
+
+    }
 };
 
 const CommandType = enum {
     JUMP,
-    FIRE,
+    MOVE,
+
+    pub fn format(self: CommandType,
+                  comptime fmt: []const u8,
+                  options: std.fmt.FormatOptions,
+                  writer: anytype) !void {
+        _ = fmt;
+        _ = options;
+        switch (self) {
+            CommandType.JUMP => try writer.print("{s} ", .{ "JUMP" }),
+            CommandType.MOVE => try writer.print("{s} ", .{ "MOVE" }),
+        }
+    }
 };
 
 const Command = struct {
-    commandType: CommandType.FIRE = undefined,
+    commandType: CommandType = undefined,
+    arg: i8 = undefined,
 
-    pub fn execute(self: *Command, actor: *GameActor) void {
+    pub fn execute(self: *const Command, actor: *GameActor) void {
         switch (self.commandType) {
-            .FIRE => actor.fire(),
-            .JUMP => actor.jump(),
-            else => {},
+            .MOVE => actor.move(self.arg),
+            .JUMP => actor.jump(self.arg),
         }
     }
+
+    pub fn format(self: Command,
+                  comptime fmt: []const u8,
+                  options: std.fmt.FormatOptions,
+                  writer: anytype) !void {
+        _ = fmt;
+        _ = options;
+        try writer.print("{any}({d}) ", .{ self.commandType, self.arg });
+    }
+
 };
 
 pub fn main() !void {
@@ -51,31 +86,40 @@ pub fn main() !void {
     };
 
     var buffer: [32]u8 = undefined;
-    var pos = [2]usize{ 3, 9 };
+    const ground = 30;
+    var player = GameActor {
+        .x = 50,
+        .y = ground,
+    };
 
     var i: usize = 0;
+    var command: ?Command = undefined;
     while (true) : (i += 1) {
-        pos[1] = @min(9, pos[1] + 1);
-
         const size = try std.posix.poll(&fds, 0);
         if (size != 0) {
             _ = std.posix.read(tty, &buffer) catch 0;
             switch(buffer[1]) {
                 '[' => switch(buffer[2]) {
                     'A' => {
-                        // std.debug.print("\nUP", .{});
-                        pos[1] -= 5;
-                    },
-                    'B' => {
-                        // std.debug.print("\nDOWN", .{});
+                        command = Command {
+                            .commandType = CommandType.JUMP,
+                            .arg = 20
+                        };
+                        command.?.execute(&player);
                     },
                     'C' => {
-                        // std.debug.print("\nRIGHT", .{});
-                        pos[0] = @mod(pos[0] + 1, 99);
+                        command = Command {
+                            .commandType = CommandType.MOVE,
+                            .arg = 1,
+                        };
+                        command.?.execute(&player);
                     },
                     'D' => {
-                        pos[0] = if(pos[0] == 0) 100 else pos[0] - 1;
-                        // std.debug.print("\nLEFT", .{});
+                        command = Command {
+                            .commandType = CommandType.MOVE,
+                            .arg = -1,
+                        };
+                        command.?.execute(&player);
                     },
                     else => {}
                 },
@@ -83,15 +127,20 @@ pub fn main() !void {
             }
         }
 
+        player.update(ground);
 
-        for (0..10) |y| {
-            for (0..100) |x| {
+        std.debug.print("\x1B[?25l", .{});
+        for (0..100) |y| {
+            std.debug.print("\x1B[{d};{d}H", .{ 0, 0 });
+            if (command) |c| 
+                std.debug.print("{any}", .{ c });
+            for (1..100) |x| {
                 std.debug.print("\x1B[{d};{d}H", .{ y, x });
-                if (x == pos[0] and y == pos[1]) {
-                    std.debug.print("x", .{});
+                if (x == player.x and y == player.y) {
+                    std.debug.print("⚈", .{});
                     continue;
                 }
-                if (y == 9) {
+                if (y == ground) {
                     std.debug.print("_", .{});
                 }
                 else {
@@ -99,7 +148,5 @@ pub fn main() !void {
                 }
             }
         }
-
-        std.time.sleep(std.time.ns_per_ms * 60);
     }
 }
