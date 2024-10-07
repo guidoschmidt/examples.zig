@@ -13,39 +13,26 @@ fn div10(comptime T: type, v: T) T {
     return @divTrunc(v, 10);
 }
 
-fn addX(comptime T: type, v: T, a: T) T {
-    return v + a;
+fn addX(comptime T: type, comptime v: T, x: T) T {
+    return v + x;
 }
 
-fn divX(comptime T: type, d: T, v: T) T {
-    return @divFloor(v, d);
+fn multX(comptime T: type, comptime v: T, x: T) T {
+    return v * x;
 }
 
-fn multX(v: anytype, m: anytype) @TypeOf(m) {
-    return v * m;
+fn multXX(comptime T: type, comptime v: T, comptime u: T, x: T) T {
+    return v * u * x;
 }
 
 pub fn main() !void {
-    const mult5 = f.partial(multX, 5);
-    std.debug.print("\n{d}", .{ mult5(3) });
+    const mult5 = f.partial(u8, multX, 5);
+    const mult2and5 = f.partial2(u8, multXX, 2, 5);
+    std.debug.print("\n{d}, {d}", .{mult5(3), mult2and5(3)});
 
-    // const c_f32 = f.comp(f32, &.{
-    //     f.partial(f32, multX, 5),
-    //     f.partial(f32, addX, 10),
-    // });
-    // std.debug.print("\n\n(x * 5) + 10", .{});
-    // for (1..10) |x| {
-    //     const result = c_f32(@floatCast(@as(f32, @floatFromInt(x))));
-    //     std.debug.print("\n{x:.2}  →  {d:>5.2}, {any}", .{ x, result, @TypeOf(result) });
-    // }
-
-    // const c_i32 = f.comp(i32, &.{
-    //     f.partial(i32, multX, 10),
-    //     f.partial(i32, divX, 2),
-    // });
-    // std.debug.print("\n\n(x * 10) / 2", .{});
-    // for (1..10) |x| {
-    //     const result = c_i32(@intCast(x));
-    //     std.debug.print("\n{d}  →  {d}, {any}", .{ x, result, @TypeOf(result) });
-    // }
+    const comp_fn = f.comp(u8, &.{
+        f.partial(u8, multX, 5),
+        f.partial(u8, addX, 10),
+    });
+    std.debug.print("\n\n(x * 5) + 10: {d}", .{ comp_fn(3) });
 }

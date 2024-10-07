@@ -38,85 +38,24 @@ pub fn mul(comptime T: type, m: T, arg: T) T {
     return arg * m;
 }
 
-pub fn wrapNoOpts(comptime outer: []const u8, comptime inner: []const u8) []const u8 {
-    return "<" ++ outer ++ ">" ++ inner ++ "</" ++ outer ++ ">";
+pub fn wrapNoOpts(comptime _: @TypeOf([]const u8), alloc: std.mem.Allocator, outer: []const u8, inner: []const u8) []const u8 {
+    return std.fmt.allocPrint(alloc, "<{s}>{s}</{s}>", .{ outer, inner, outer }) catch return "";
 }
 
-pub fn wrap(comptime outer: []const u8, comptime options: []const u8, comptime inner: []const u8) []const u8 {
-    return "<" ++ outer ++ " " ++ options ++ ">" ++ inner ++ "</" ++ outer ++ ">";
+pub fn wrap(comptime _: @TypeOf([]const u8), alloc: std.mem.Allocator, outer: []const u8, options: []const u8, inner: []const u8) []const u8 {
+    return std.fmt.allocPrint(alloc, "<{s} {s}>{s}</{s}>", .{ outer, options, inner, outer }) catch return "";
 }
 
 
 pub fn main() !void {
+    // const inner = "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />";
+    // _ = inner;
 
-    const inner = "<circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />";
-    _ = inner;
-
-    const svg = f.partial2Typed([]const u8, wrap, "svg", "viewBox=\"0 0 300 100\" xmlns=\"http://www.w3.org/2000/svg\"");
-    const g = f.partialTyped([]const u8, wrapNoOpts, "g");
-    const t = f.partial2Typed([]const u8, wrap, "text", "fill=\"black\" x=\"0\" y=\"0\"");
+    const svg = f.partialGeneric([]const u8, wrap, .{ allocator, "sv", "viewBox=\"0 0 300 100\" xmlns=\"http://www.w3.org/2000/svg\""});
+    const g = f.partialGeneric([]const u8, wrapNoOpts, .{ allocator, "g" });
+    // const t = f.partial2([]const u8, wrap, "text", "fill=\"black\" x=\"0\" y=\"0\"");
     
-    const output = svg(g(t("Test")));
-    std.debug.print("\n{s}", .{ output });
-
-    
-    // const file_path = "out/test.svg";
-    // const file = try fs.cwd().createFile(file_path, .{});
-    // defer file.close();
-    // _ = try file.write(output);
-
-
-    
-    // const input = [_]f32{9, 18, 27};
-    // _ = input;
-    // const result = try map([]f32, @as(f32, 10.0), f.partial(f32, mul, 9));
-    // for (result) |r| {
-    //     std.debug.print("\n{d}", .{ r });
-    // }
-
-    // const file_path = "data/dailyActivity_merged.csv";
-    // const file = try fs.cwd().openFile(file_path, .{ .mode = .read_only });
-    // defer file.close();
-    // const reader = file.reader();
-    // var contents = std.ArrayList(u8).init(allocator);
-    // try reader.streamUntilDelimiter(contents.writer(), '\n', null);
-    // std.debug.print("\n{s}\nCount: {d}", .{ contents.items, contents.items.len });
-
-    // const line : []const u8 = try allocator.dupe(u8, contents.items);
-
-    // var splitIt = std.mem.tokenize(u8, line, ",");
-    // while (splitIt.next()) |entry| {
-    //     std.debug.print("\n{s}", .{ entry });
-    // }
-
-    // const cols = [_][]const u8 { "TotalSteps", "TotalDistance" };
-    // comptime var fields: [cols.len]std.builtin.Type.StructField = undefined;
-    // comptime var i: usize = 0;
-    // inline for (cols) |col| {
-    //     std.debug.print("\n\n{s}", .{ col });
-    //     fields[i] = .{
-    //             .name = col,
-    //             .type = u8,
-    //             .default_value = "",
-    //             .is_comptime = false,
-    //             .alignment = @alignOf(u8),
-    //     };
-    //     i += 1;
-    // }
-
-    // std.debug.print("\n{d}", .{ fields.len });
-    // inline for (fields) |field| {
-    //     std.debug.print("\n{s}, {any}", .{ field.name, field.type });
-    // }
-    // const decls: [0]std.builtin.Type.Declaration = [_]std.builtin.Type.Declaration{};
-    // const TestType = @Type(.{
-    //     .Struct = .{
-    //         .layout = .Auto,
-    //         .is_tuple = false,
-    //         .fields = &fields,
-    //         .decls = &decls,
-    //     },
-    // });
-    // const inst: TestType = TestType{ .TotalSteps = 3 };
-    // std.debug.print("\n\n{any}\n{any}", .{ TestType, inst });
+    const output1 = svg(g("Test"));
+    // const output = svg(output1);
+    std.debug.print("\n{s}\n{s}", .{ output1, "" });
 }

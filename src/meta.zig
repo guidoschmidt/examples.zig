@@ -1,4 +1,23 @@
 const std = @import("std");
+const fun = @import("./lib/functional.zig");
+
+fn add(comptime arg0: anytype) @TypeOf(arg0) {
+    return arg0 + 1;
+}
+
+fn generic(comptime func: anytype, comptime args: anytype) void {
+    const FuncType = @TypeOf(func);
+    const args_info = @typeInfo(FuncType).Fn.params;
+    inline for(0..args_info.len) |i| {
+        std.debug.print("\n{any}", .{ args_info[i] });
+    }
+
+    const ArgsType = @TypeOf(args);
+    const fields_info = @typeInfo(ArgsType).Struct.fields;
+    inline for(0..fields_info.len) |i| {
+        std.debug.print("\n{any}: {any}", .{ fields_info[i], args[i] });
+    }
+}
 
 const DataStruct = struct {
     seed: u16 = undefined,
@@ -40,4 +59,6 @@ const DataStruct = struct {
 pub fn main() !void {
     const ds = DataStruct.initRandom();
     std.debug.print("\n{any}", .{ ds });
+
+    generic(add, .{ 2, 4 });
 }

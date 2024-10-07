@@ -34,7 +34,7 @@ pub fn main() !void {
     // print("\nParsed Person:\n{s}: {?}", .{ parsed_person.name, parsed_person.age });
 
     // ------ 0.12.0 ------
-    var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
     
