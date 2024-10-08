@@ -45,7 +45,7 @@ fn fibonacciDynamicProgramming(comptime T: type, n: T) T {
 }
 
 pub fn main() !void {
-    const input_values = [_]u32{ 1, 2, 3, 8, 12, 30, 40, 55 };
+    const input_values = [_]u32{ 1, 2, 3, 8, 12, 30, 40, 42, 43, 44 };
 
     for (input_values) |input| {
         std.debug.print("\n\n>>> Input \x1B[33m{d}\x1B[0m → fibonacci", .{ input });
