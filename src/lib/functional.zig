@@ -1,11 +1,11 @@
 const std = @import("std");
 
-pub fn comp(comptime T: type, comptime fns: anytype) fn(arg: T) T {
+pub fn comp(comptime T: type, comptime fns: anytype) fn (arg: T) T {
     return struct {
         pub fn f(arg: T) T {
             var tmp: T = arg;
             inline for (fns) |func| {
-                tmp = @call(.auto, func, .{ tmp });
+                tmp = @call(.auto, func, .{tmp});
             }
             return tmp;
         }
@@ -29,15 +29,15 @@ pub fn partial2(comptime T: type, func: anytype, comptime arg0: anytype, comptim
 }
 
 pub fn partialGeneric(comptime T: type, func: anytype, comptime args: anytype) *const fn (arg: T) T {
-    const field_info = @typeInfo(@TypeOf(args)).Struct.fields;
+    const field_info = @typeInfo(@TypeOf(args)).@"struct".fields;
     return struct {
         pub fn f(arg: T) T {
             // @compileLog(());
-            switch(field_info.len) {
+            switch (field_info.len) {
                 1 => return @call(.auto, func, .{ T, args[0], arg }),
                 2 => return @call(.auto, func, .{ T, args[0], args[1], arg }),
                 3 => return @call(.auto, func, .{ T, args[0], args[1], args[2], arg }),
-                else => return @call(.auto, func, .{ T }),
+                else => return @call(.auto, func, .{T}),
             }
         }
     }.f;
