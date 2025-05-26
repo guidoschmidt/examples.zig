@@ -26,9 +26,10 @@ pub fn main() !void {
         print("\n----------\nBinary: \n", .{});
         while (idx < bit_set.capacity()) {
             const val: bool = bit_set.isSet((bit_set.capacity() - 1) - idx);
-            print("{}", .{ @intFromBool(val) });
+            print("{}", .{@intFromBool(val)});
             idx += 1;
         }
         print("\n----------\n", .{});
+        print("\n{any}", .{bit_set.mask});
     }
 }
