@@ -1,9 +1,0 @@
-(undo-tree-save-format-version . 1)
-"25ef4122c692bac7121ce076bda07cc7ec000946"
-[nil nil nil nil (26319 29948 971045 0) 0 nil]
-([nil nil ((apply yas--take-care-of-redo #s(yas--snippet nil (#s(yas--field 1 37 37 nil nil nil nil nil)) nil 66 nil #s(yas--field 1 37 37 nil nil nil nil nil) nil nil)) (22 . 26) (#("  " 0 2 (fontified nil)) . 22) (1 . 42)) nil (26319 29969 887125 0) 0 nil])
-([nil nil ((apply yas--snippet-revive 1 44 #s(yas--snippet nil (#s(yas--field 1 37 37 nil nil nil nil nil)) nil 66 nil #s(yas--field 1 37 37 nil nil nil nil nil) nil nil))) nil (26319 29969 887124 0) 0 nil])
-([nil nil ((44 . 46)) nil (26319 29969 887123 0) 0 nil])
-([nil nil ((apply yas--snippet-revive 46 69 #s(yas--snippet nil nil nil 67 nil nil nil nil)) (apply yas--take-care-of-redo #s(yas--snippet nil nil nil 67 nil nil nil nil)) (46 . 69)) nil (26319 29969 887122 0) 0 nil])
-([nil current ((69 . 70) 68) nil (26319 29969 887118 0) 0 nil])
-nil
