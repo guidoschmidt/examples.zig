@@ -7,10 +7,10 @@
 
 Build all examples:
 ```
-zig build
+zig build -- all
 ```
 
-Build and run a single example with `zig build example_name`, e.g.
+Build and run a single example with `zig build -- ./src/examples/path/to/example.zig`, e.g.
 ```
-zig build greet
+zig build -- ./src/examples/datastructures/reactivity.zig
 ```
