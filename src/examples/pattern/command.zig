@@ -1,5 +1,6 @@
 /// source: https://gameprogrammingpatterns.com/
 const std = @import("std");
+const builtin = @import("builtin");
 
 const GameActor = struct {
     x: i8,
@@ -55,6 +56,8 @@ const Command = struct {
 };
 
 pub fn main() !void {
+    if (builtin.os.tag == .windows) @panic("Not implemented for Windows");
+
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
 
