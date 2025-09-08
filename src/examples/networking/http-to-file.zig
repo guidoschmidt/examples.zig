@@ -8,9 +8,10 @@ pub fn main() !void {
         .allocator = allocator,
     };
 
-    var body: std.Io.Writer.Allocating = .init(allocator);
-    defer body.deinit();
-    try body.ensureUnusedCapacity(1024);
+    var body_file = try std.fs.cwd().createFile("aoc", .{});
+    defer body_file.close();
+    var buffer: [1]u8 = undefined;
+    var body_writer = body_file.writerStreaming(&buffer);
 
     _ = try client.fetch(.{
         .location = .{ .url = "https://adventofcode.com/2023/day/6/input" },
@@ -21,9 +22,6 @@ pub fn main() !void {
             },
         },
         .method = .GET,
-        .response_writer = &body.writer,
+        .response_writer = &body_writer.interface,
     });
-
-    const response = try body.toOwnedSlice();
-    std.debug.print("\nResult:\n{s}\n", .{response});
 }
