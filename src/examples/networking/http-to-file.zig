@@ -8,19 +8,14 @@ pub fn main() !void {
         .allocator = allocator,
     };
 
-    var body_file = try std.fs.cwd().createFile("aoc", .{});
+    var body_file = try std.fs.cwd().createFile("http-response", .{});
     defer body_file.close();
     var buffer: [1]u8 = undefined;
     var body_writer = body_file.writerStreaming(&buffer);
 
     _ = try client.fetch(.{
-        .location = .{ .url = "https://adventofcode.com/2023/day/6/input" },
-        .extra_headers = &.{
-            .{
-                .name = "cookie",
-                .value = "***REMOVED***",
-            },
-        },
+        .location = .{ .url = "https://echo.free.beeceptor.com" },
+        .extra_headers = &.{},
         .method = .GET,
         .response_writer = &body_writer.interface,
     });

@@ -13,13 +13,8 @@ pub fn main() !void {
     try body.ensureUnusedCapacity(1024);
 
     _ = try client.fetch(.{
-        .location = .{ .url = "https://adventofcode.com/2023/day/6/input" },
-        .extra_headers = &.{
-            .{
-                .name = "cookie",
-                .value = "***REMOVED***",
-            },
-        },
+        .location = .{ .url = "https://echo.free.beeceptor.com" },
+        .extra_headers = &.{},
         .method = .GET,
         .response_writer = &body.writer,
     });
