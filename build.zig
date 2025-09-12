@@ -104,7 +104,7 @@ pub fn build(b: *std.Build) !void {
     // }
     // print("----------------\n", .{});
 
-    const single_example_path = args[args.len - 1];
+    const single_example_path = if (args.len < 10) "all" else args[args.len - 1];
     if (find(&examples, single_example_path)) {
         print("Found example: {s}", .{single_example_path});
         try createExecutable(b, module_shared, target, optimize, single_example_path);
