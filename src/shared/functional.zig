@@ -42,11 +42,3 @@ pub fn partialGeneric(comptime T: type, func: anytype, comptime args: anytype) *
         }
     }.f;
 }
-
-// pub fn partial2Typed(comptime T: type, comptime fun: anytype, comptime arg0: T, comptime arg1: T) *const fn (comptime r0: @TypeOf(arg0)) @TypeOf(arg0) {
-//     return struct {
-//         pub fn f(comptime arg: @TypeOf(arg0)) @TypeOf(arg) {
-//             return fun(arg0, arg1, arg);
-//         }
-//     }.f;
-// }
