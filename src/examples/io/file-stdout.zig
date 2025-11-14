@@ -1,3 +1,5 @@
+// references:
+// - https://ziggit.dev/t/new-zigger-exploring-performance/13006
 const std = @import("std");
 
 pub fn main() !void {
