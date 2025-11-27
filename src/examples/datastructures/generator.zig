@@ -83,5 +83,6 @@ pub fn main() !void {
         var writer = std.fs.File.stdout().writerStreaming(&writter_buffer);
         _ = try reader.interface.streamDelimiter(&writer.interface, '\n');
         _ = try reader.interface.takeByte();
+        std.debug.print("Press [Enter] to continue.\n", .{});
     }
 }
