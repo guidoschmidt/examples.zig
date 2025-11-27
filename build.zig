@@ -97,14 +97,18 @@ pub fn build(b: *std.Build) !void {
         .target = target,
     });
 
+    const root_dir = try std.fs.path.join(b.allocator, &.{ "src", "examples" });
+    try parseDir(b, 0, root_dir, &examples);
+
+    // Print a list of every example found
     // print("\n\n--- Examples ---\n", .{});
-    try parseDir(b, 0, "./src/examples", &examples);
     // for (examples.items) |example_src| {
     //     print("- {s}\n", .{example_src});
     // }
     // print("----------------\n", .{});
 
-    const single_example_path = if (args.len < 10) "all" else args[args.len - 1];
+    const arg = if (args.len < 10) "all" else args[args.len - 1];
+    const single_example_path = try std.fs.path.resolve(b.allocator, &.{arg});
     if (find(&examples, single_example_path)) {
         print("Found example: {s}", .{single_example_path});
         try createExecutable(b, module_shared, target, optimize, single_example_path);

@@ -10,7 +10,12 @@ Build all examples:
 zig build -- all
 ```
 
-Build and run a single example with `zig build -- ./src/examples/path/to/example.zig`, e.g.
+Build a single example with `zig build -- ./src/examples/path/to/example.zig`, e.g.
 ```
 zig build -- ./src/examples/datastructures/reactivity.zig
+```
+
+Bulid + run a single example with `zig build run-$EXAMPLE_FILE_NAME -- ./src/examples/path/to/example.zig`, e.g.
+```
+zig build run-reactivity -- ./src/examples/datastructures/reactivity.zig
 ```
