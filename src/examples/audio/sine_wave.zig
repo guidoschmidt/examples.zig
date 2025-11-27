@@ -1,3 +1,6 @@
+/// Sources:
+/// https://blog.jfo.click/makin-wavs-with-zig/
+/// https://zig.news/xq/re-makin-wavs-with-zig-1jjd
 const std = @import("std");
 
 const SAMPLE_RATE = 44100;
